@@ -6,6 +6,8 @@ from typing import Optional
 import logging
 from uuid6 import uuid7
 import uuid
+import psycopg2
+from psycopg2.extras import RealDictCursor
 
 
 logger = logging.Logger("coolsoc_logger")
@@ -27,10 +29,34 @@ class Post(BaseModel):
 
 
 
+try:
+    conn = psycopg2.connect(host = 'localhost' , database='fastapi' , user= 'postgres' ,
+                             password='Azure@admin4' , cursor_factory=RealDictCursor)
+    
+    cursor = conn.cursor()
+    print("Successfully connected to the database")
+
+except Exception as error:
+    print(error)
+
+
 
 @app.get("/")
 def root(): 
     return { "Welcome to cool social application" }
+
+
+@app.put("/posts/{id}"  , status_code= status.HTTP_200_OK)
+async def update_post(id:uuid.UUID , payload: Post):
+    for index,post in enumerate(posts):
+        if post["id"] == id:
+            new_post = payload.model_dump()
+            new_post["id"] = post["id"]
+            posts[index] = new_post
+            return {f"Post with id {id} have been updated successfully"}
+        
+    
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
 
 @app.get("/posts/{id}")
@@ -53,10 +79,8 @@ async def create_post(payload: Post):
     return {"message" : f"new post created successfully with id {new_post["id"]}"}
 
 
-@app.put("/posts/{id}")
-async def update_post(id:uuid.UUID , payload: Post):
-    for index,post in enumerate(posts):
-        print(index)
+        
+            
 
 
 
