@@ -6,8 +6,7 @@ from typing import Optional
 import logging
 from uuid6 import uuid7
 import uuid
-import psycopg2
-from psycopg2.extras import RealDictCursor
+from .database import conn, cursor
 
 
 logger = logging.Logger("coolsoc_logger")
@@ -26,18 +25,6 @@ class Post(BaseModel):
     published: bool=True
     rating: Optional[int] = None
     created_at: Optional[datetime.datetime] = None
-
-
-
-try:
-    conn = psycopg2.connect(host = 'localhost' , database='fastapi' , user= 'postgres' ,
-                             password='Azure@admin4' , cursor_factory=RealDictCursor)
-    
-    cursor = conn.cursor()
-    print("Successfully connected to the database")
-
-except Exception as error:
-    print(error)
 
 
 
