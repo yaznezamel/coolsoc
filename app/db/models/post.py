@@ -1,9 +1,10 @@
-from sqlalchemy import Column, Integer, String, Boolean
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql.expression import text
 from sqlalchemy.sql.sqltypes import TIMESTAMP
 import uuid
 from app.db.database import Base
+from sqlalchemy.orm import relationship
 
 class Post(Base):
     __tablename__ = "post"
@@ -14,3 +15,6 @@ class Post(Base):
     published = Column(Boolean, server_default='TRUE', nullable=False)
     rating = Column(Integer, nullable=True)
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))
+    owner_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+
+    owner = relationship("User", back_populates="posts")
