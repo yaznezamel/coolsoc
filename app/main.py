@@ -2,15 +2,17 @@ import datetime
 from fastapi import FastAPI, status, HTTPException, Depends
 from typing import List
 from sqlalchemy.orm import Session
+from typing import List
+from sqlalchemy.orm import Session
 import uuid
 
+from app import __version__
 import app.models.post as models
+import app.models.user as user_models
 import app.schemas.posts as schemas
 from app.db.database import get_db, engine
 
-models.Base.metadata.create_all(bind=engine)
-
-app = FastAPI()
+app = FastAPI(title="coolsoc", version=__version__)
 
 @app.get("/")
 def root(): 
