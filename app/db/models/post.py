@@ -17,4 +17,4 @@ class Post(Base):
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))
     owner_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
 
-    owner = relationship("User", back_populates="posts")
+    r_owner = relationship("User", back_populates="r_posts")
