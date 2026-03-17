@@ -12,7 +12,7 @@ class PostBase(BaseModel):
     rating: Optional[int] = None
 
 class PostCreate(PostBase):
-    owner_id: uuid.UUID
+    pass
 
 class Post(PostBase):
     model_config = ConfigDict(from_attributes=True)
