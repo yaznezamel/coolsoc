@@ -3,13 +3,14 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql.expression import text
 from sqlalchemy.sql.sqltypes import TIMESTAMP
 import uuid
+from uuid_extensions import uuid7
 from app.db.database import Base
 from sqlalchemy.orm import relationship
 
 class Post(Base):
     __tablename__ = "post"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, nullable=False)
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid7, nullable=False)
     title = Column(String, nullable=False)
     content = Column(String, nullable=False)
     published = Column(Boolean, server_default='TRUE', nullable=False)
@@ -17,4 +18,4 @@ class Post(Base):
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))
     owner_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
 
-    r_owner = relationship("User", back_populates="r_posts")
+    owner = relationship("User", back_populates="posts")

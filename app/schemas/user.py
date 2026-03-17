@@ -6,12 +6,16 @@ import uuid
 from app.schemas.posts import Post
 
 
-class User(BaseModel):
-    model_config = ConfigDict(extra='forbid')
-
-    id: Optional[uuid.UUID] = None
+class UserBase(BaseModel):
     username: str
+
+class UserCreate(UserBase):
     password: str
-    created_at: Optional[datetime.datetime] = None
-    posts: List[Post]
+
+class User(UserBase):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    created_at: datetime.datetime
+    posts: List[Post] = []
 

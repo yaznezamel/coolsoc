@@ -3,12 +3,20 @@ from pydantic import BaseModel, ConfigDict
 from typing import Optional
 import uuid
 
-class Post(BaseModel):
+class PostBase(BaseModel):
     model_config = ConfigDict(extra='forbid')
 
-    id: Optional[uuid.UUID] = None
     title: str
     content: str
     published: bool = True
     rating: Optional[int] = None
-    created_at: Optional[datetime.datetime] = None
+
+class PostCreate(PostBase):
+    owner_id: uuid.UUID
+
+class Post(PostBase):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    created_at: datetime.datetime
+    owner_id: uuid.UUID

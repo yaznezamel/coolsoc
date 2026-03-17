@@ -25,22 +25,22 @@ def get_post(id: uuid.UUID, db: Session = Depends(get_db)):
     return post
 
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=schemas.Post)
-def create_post(payload: schemas.Post, db: Session = Depends(get_db)):
-    new_post = models.Post(**payload.model_dump(exclude={"id", "created_at"}, exclude_unset=True))
+def create_post(payload: schemas.PostCreate, db: Session = Depends(get_db)):
+    new_post = models.Post(**payload.model_dump())
     db.add(new_post)
     db.commit()
     db.refresh(new_post)
     return new_post
 
 @router.put("/{id}", response_model=schemas.Post)
-def update_post(id: uuid.UUID, payload: schemas.Post, db: Session = Depends(get_db)):
+def update_post(id: uuid.UUID, payload: schemas.PostCreate, db: Session = Depends(get_db)):
     post_query = db.query(models.Post).filter(models.Post.id == id)
     post = post_query.first()
     
     if post == None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Post with id {id} not found")
         
-    post_query.update(payload.model_dump(exclude={"id", "created_at"}, exclude_unset=True), synchronize_session=False)
+    post_query.update(payload.model_dump(), synchronize_session=False)
     db.commit()
     
     return post_query.first()
