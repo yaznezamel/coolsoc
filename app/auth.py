@@ -8,10 +8,14 @@ from sqlalchemy.orm import Session
 from app.db.database import get_db
 import app.db.models.user as user_models
 
-# --- Configuration ---
-SECRET_KEY = "change-this-to-a-real-secret-key"  # TODO: move to env variable
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60
+from app.config.config import get_settings
+
+
+setting = get_settings()
+SECRET_KEY = setting.SECRET_KEY
+ALGORITHM = setting.ALGORITHM
+ACCESS_TOKEN_EXPIRE_MINUTES = setting.ACCESS_TOKEN_EXPIRE_MINUTES
+
 
 # --- Password Hashing ---
 def hash_password(password: str) -> str:
