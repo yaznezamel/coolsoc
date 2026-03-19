@@ -4,7 +4,9 @@ from fastapi import APIRouter, Depends, status, HTTPException
 from sqlalchemy.orm import Session
 
 from app.db.database import get_db
+from app.auth import get_current_user
 import app.db.models.post as models
+import app.db.models.user as user_models
 import app.schemas.posts as schemas
 
 router = APIRouter(
@@ -25,35 +27,50 @@ def get_post(id: uuid.UUID, db: Session = Depends(get_db)):
     return post
 
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=schemas.Post)
-def create_post(payload: schemas.Post, db: Session = Depends(get_db)):
-    new_post = models.Post(**payload.model_dump(exclude={"id", "created_at"}, exclude_unset=True))
+def create_post(
+    payload: schemas.PostCreate,
+    db: Session = Depends(get_db),
+    current_user: user_models.User = Depends(get_current_user),
+):
+    new_post = models.Post(**payload.model_dump(), owner_id=current_user.id)
     db.add(new_post)
     db.commit()
     db.refresh(new_post)
     return new_post
 
 @router.put("/{id}", response_model=schemas.Post)
-def update_post(id: uuid.UUID, payload: schemas.Post, db: Session = Depends(get_db)):
-    post_query = db.query(models.Post).filter(models.Post.id == id)
-    post = post_query.first()
-    
-    if post == None:
+def update_post(
+    id: uuid.UUID,
+    payload: schemas.PostCreate,
+    db: Session = Depends(get_db),
+    current_user: user_models.User = Depends(get_current_user),
+):
+    post = db.query(models.Post).filter(models.Post.id == id).first()
+
+    if not post:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Post with id {id} not found")
-        
-    post_query.update(payload.model_dump(exclude={"id", "created_at"}, exclude_unset=True), synchronize_session=False)
+    if post.owner_id != current_user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="You can only edit your own posts")
+
+    db.query(models.Post).filter(models.Post.id == id).update(payload.model_dump(), synchronize_session=False)
     db.commit()
-    
-    return post_query.first()
+
+    return db.query(models.Post).filter(models.Post.id == id).first()
 
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_post(id: uuid.UUID, db: Session = Depends(get_db)):
-    post_query = db.query(models.Post).filter(models.Post.id == id)
-    post = post_query.first()
-    
-    if post == None:
+def delete_post(
+    id: uuid.UUID,
+    db: Session = Depends(get_db),
+    current_user: user_models.User = Depends(get_current_user),
+):
+    post = db.query(models.Post).filter(models.Post.id == id).first()
+
+    if not post:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Post with id {id} not found")
-        
-    post_query.delete(synchronize_session=False)
+    if post.owner_id != current_user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="You can only delete your own posts")
+
+    db.query(models.Post).filter(models.Post.id == id).delete(synchronize_session=False)
     db.commit()
-    
+
     return

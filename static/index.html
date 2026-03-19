@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="CoolSoc — a simple social posting app">
+    <title>CoolSoc</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <header>
+        <h1>🧊 CoolSoc</h1>
+        <div id="header-right">
+            <span id="greeting"></span>
+            <button id="logout-btn" class="btn btn-small" onclick="logout()" style="display:none;">Logout</button>
+        </div>
+    </header>
+
+    <main>
+        <!-- ========== AUTH SECTION ========== -->
+        <section id="auth-section">
+            <div class="card auth-card">
+                <div class="tab-bar">
+                    <button class="tab active" onclick="showTab('login')">Login</button>
+                    <button class="tab" onclick="showTab('register')">Register</button>
+                </div>
+
+                <!-- Login Form -->
+                <form id="login-form" onsubmit="handleLogin(event)">
+                    <input type="text" id="login-username" placeholder="Username" required>
+                    <input type="password" id="login-password" placeholder="Password" required>
+                    <button type="submit" class="btn">Login</button>
+                    <p id="login-error" class="error"></p>
+                </form>
+
+                <!-- Register Form -->
+                <form id="register-form" onsubmit="handleRegister(event)" style="display:none;">
+                    <input type="text" id="reg-username" placeholder="Username" required>
+                    <input type="password" id="reg-password" placeholder="Password" required>
+                    <button type="submit" class="btn">Register</button>
+                    <p id="reg-error" class="error"></p>
+                    <p id="reg-success" class="success"></p>
+                </form>
+            </div>
+        </section>
+
+        <!-- ========== POSTS SECTION ========== -->
+        <section id="posts-section" style="display:none;">
+            <!-- Create Post -->
+            <div class="card">
+                <h2>Create a Post</h2>
+                <form id="create-post-form" onsubmit="handleCreatePost(event)">
+                    <input type="text" id="post-title" placeholder="Title" required>
+                    <textarea id="post-content" placeholder="What's on your mind?" required></textarea>
+                    <button type="submit" class="btn">Post</button>
+                    <p id="post-error" class="error"></p>
+                </form>
+            </div>
+
+            <!-- Posts Feed -->
+            <h2>Posts</h2>
+            <div id="posts-feed"></div>
+        </section>
+    </main>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
