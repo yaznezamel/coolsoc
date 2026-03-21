@@ -1,1 +1,1 @@
-# coolsoc
+# Diwan
